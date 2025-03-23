@@ -1,0 +1,43 @@
+name: Deploy Caddy
+
+on:
+  push:
+    branches:
+      - deployment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy Caddy
+    env:
+      MACHINE: raspberrypi
+      USER: caddy
+    steps:
+      - name: Setup Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          ref: deployment
+          sparse-checkout: |
+            containers
+      - name: Install Quadlet files to host
+        env:
+          TS_AUTHKEY: ${{ secrets.TS_AUTHKEY }}
+        run: |
+          echo "TS_AUTHKEY=$TS_AUTHKEY?ephemeral=true" > containers/systemd/.env
+
+          ssh -o StrictHostKeyChecking=no $USER@$MACHINE "systemctl --user is-active caddy.service && systemctl --user stop caddy.service || true"
+
+          ssh -o StrictHostKeyChecking=no $USER@$MACHINE "mkdir -p -- ~/caddy/conf ~/caddy/data ~/caddy/config ~/.config/containers/systemd"
+          ssh -o StrictHostKeyChecking=no $USER@$MACHINE "test -f ~/caddy/conf/Caddyfile || touch ~/caddy/conf/Caddyfile"
+          scp -o StrictHostKeyChecking=no -r containers/systemd/. $USER@$MACHINE:~/.config/containers/systemd/
+
+          ssh -o StrictHostKeyChecking=no $USER@$MACHINE "systemctl --user daemon-reload"
+      - name: Start Caddy
+        run: |
+          ssh -o StrictHostKeyChecking=no $USER@$MACHINE "systemctl --user start caddy.service"
