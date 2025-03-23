@@ -1,0 +1,15 @@
+[Unit]
+PartOf=caddy.service
+
+[Container]
+ContainerName=caddy-tailscaled
+Image=docker.io/tailscale/tailscale:latest
+HostName=caddy-tailscaled
+EnvironmentFile=.env
+Environment=TS_HOSTNAME=caddy
+Environment=TS_EXTRA_ARGS=--advertise-tags=tag:caddy
+Environment=TS_TAILSCALED_EXTRA_ARGS=--state=mem:
+LogDriver=passthrough
+
+[Service]
+Restart=always
