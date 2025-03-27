@@ -1,17 +1,15 @@
 [Unit]
 Description=Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
-Requires=caddy-tailscaled.service
-After=caddy-tailscaled.service
+Requires=tailscaled.service
+After=tailscaled.service
 
 [Container]
 ContainerName=caddy
 Image=quay.io/fariszr/caddy-dns:cloudflare
-HostName=caddy-server
-Network=container:caddy-tailscaled
+Network=container:tailscaled
 Volume=%h/caddy/conf:/etc/caddy:Z
 Volume=%h/caddy/data:/data
 Volume=%h/caddy/config:/config
-LogDriver=passthrough
 
 [Service]
 Restart=always
