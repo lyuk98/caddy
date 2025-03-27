@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy Caddy
     env:
-      MACHINE: raspberrypi
-      USER: caddy
+      TS_MACHINE: ${{ secrets.TS_MACHINE }}
+      TS_USER: ${{ secrets.TS_USER }}
     steps:
       - name: Setup Tailscale
         uses: tailscale/github-action@v3
@@ -28,16 +28,18 @@ jobs:
       - name: Install Quadlet files to host
         env:
           TS_AUTHKEY: ${{ secrets.TS_AUTHKEY }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
-          echo "TS_AUTHKEY=$TS_AUTHKEY?ephemeral=true" > containers/systemd/.env
+          echo "TS_AUTHKEY=$TS_AUTHKEY" > containers/systemd/.env
+          echo "CLOUDFLARE_API_TOKEN=$CLOUDFLARE_API_TOKEN" >> containers/systemd/.env
 
-          ssh -o StrictHostKeyChecking=no $USER@$MACHINE "systemctl --user is-active caddy.service && systemctl --user stop caddy.service || true"
+          ssh -o StrictHostKeyChecking=no $TS_USER@$TS_MACHINE "systemctl --user is-active caddy.service && systemctl --user stop caddy.service || true"
 
-          ssh -o StrictHostKeyChecking=no $USER@$MACHINE "mkdir -p -- ~/caddy/conf ~/caddy/data ~/caddy/config ~/.config/containers/systemd"
-          ssh -o StrictHostKeyChecking=no $USER@$MACHINE "test -f ~/caddy/conf/Caddyfile || touch ~/caddy/conf/Caddyfile"
-          scp -o StrictHostKeyChecking=no -r containers/systemd/. $USER@$MACHINE:~/.config/containers/systemd/
+          ssh -o StrictHostKeyChecking=no $TS_USER@$TS_MACHINE "mkdir -p -- ~/caddy/conf ~/caddy/data ~/caddy/config ~/.config/containers/systemd"
+          ssh -o StrictHostKeyChecking=no $TS_USER@$TS_MACHINE "test -f ~/caddy/conf/Caddyfile || touch ~/caddy/conf/Caddyfile"
+          scp -o StrictHostKeyChecking=no -r containers/systemd/. $TS_USER@$TS_MACHINE:~/.config/containers/systemd/
 
-          ssh -o StrictHostKeyChecking=no $USER@$MACHINE "systemctl --user daemon-reload"
+          ssh -o StrictHostKeyChecking=no $TS_USER@$TS_MACHINE "systemctl --user daemon-reload"
       - name: Start Caddy
         run: |
-          ssh -o StrictHostKeyChecking=no $USER@$MACHINE "systemctl --user start caddy.service"
+          ssh -o StrictHostKeyChecking=no $TS_USER@$TS_MACHINE "systemctl --user start caddy.service"
