@@ -3,7 +3,7 @@ PartOf=caddy.service
 
 [Container]
 ContainerName=tailscaled
-Image=docker.io/tailscale/tailscale:latest
+Image=docker.io/tailscale/tailscale:stable
 EnvironmentFile=.env
 Environment=TS_HOSTNAME=caddy
 Environment=TS_EXTRA_ARGS=--advertise-tags=tag:caddy
