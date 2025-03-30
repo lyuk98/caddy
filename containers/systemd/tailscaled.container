@@ -6,8 +6,9 @@ ContainerName=tailscaled
 Image=docker.io/tailscale/tailscale:stable
 EnvironmentFile=.env
 Environment=TS_HOSTNAME=caddy
+Environment=TS_USERSPACE=false
 Environment=TS_EXTRA_ARGS=--advertise-tags=tag:caddy
-Environment=TS_TAILSCALED_EXTRA_ARGS=--state=mem:
+Volume=/dev/net/tun:/dev/net/tun
 
 [Service]
 Restart=always
