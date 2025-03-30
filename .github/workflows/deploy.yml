@@ -35,7 +35,7 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no $TS_USER@$TS_MACHINE "systemctl --user is-active caddy.service && systemctl --user stop caddy.service || true"
 
-          ssh -o StrictHostKeyChecking=no $TS_USER@$TS_MACHINE "mkdir -p -- ~/caddy/conf ~/caddy/data ~/caddy/config ~/.config/containers/systemd"
+          ssh -o StrictHostKeyChecking=no $TS_USER@$TS_MACHINE "mkdir -p -- ~/caddy/conf ~/caddy/data ~/caddy/config ~/tailscaled/state ~/.config/containers/systemd"
           ssh -o StrictHostKeyChecking=no $TS_USER@$TS_MACHINE "test -f ~/caddy/conf/Caddyfile || touch ~/caddy/conf/Caddyfile"
           scp -o StrictHostKeyChecking=no -r containers/systemd/. $TS_USER@$TS_MACHINE:~/.config/containers/systemd/
 

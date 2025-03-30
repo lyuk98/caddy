@@ -6,9 +6,11 @@ ContainerName=tailscaled
 Image=docker.io/tailscale/tailscale:stable
 EnvironmentFile=.env
 Environment=TS_HOSTNAME=caddy
+Environment=TS_STATE_DIR=/var/lib/tailscale
 Environment=TS_USERSPACE=false
 Environment=TS_EXTRA_ARGS=--advertise-tags=tag:caddy
 Volume=/dev/net/tun:/dev/net/tun
+Volume=%h/tailscaled/state:/var/lib/tailscale
 
 [Service]
 Restart=always
