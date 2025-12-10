@@ -4,6 +4,7 @@ PartOf=caddy.service
 [Container]
 ContainerName=tailscaled
 Image=docker.io/tailscale/tailscale:stable
+AutoUpdate=registry
 EnvironmentFile=.env
 Environment=TS_HOSTNAME=caddy
 Environment=TS_STATE_DIR=/var/lib/tailscale

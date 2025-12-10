@@ -6,6 +6,7 @@ After=tailscaled.service
 [Container]
 ContainerName=caddy
 Image=quay.io/fariszr/caddy-dns:cloudflare
+AutoUpdate=registry
 Network=container:tailscaled
 EnvironmentFile=.env
 Volume=%h/caddy/conf:/etc/caddy:Z
